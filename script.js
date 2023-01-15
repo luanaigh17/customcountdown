@@ -16,6 +16,8 @@ let countdownDate = "";
 let countdownValue = Date;
 let countdownActive;
 
+let savedCountdown;
+
 
 const second = 1000;
 const minute = second * 60;
@@ -75,7 +77,13 @@ function updateCountdown(e) {
     e.preventDefault();
     countdownTitle = e.srcElement[0].value;
     countdownDate = e.srcElement[1].value;
-    console.log(countdownTitle,countdownDate);
+    savedCountdown = {
+        title: countdownTitle,
+        date: countdownDate,
+    };
+
+    console.log(savedCountdown);
+    localStorage.setItem("countdown", JSON.stringify(savedCountdown));
 //   ! Check for Actual Date input
     if (countdownDate === "") {
         alert("Please select a date for the Countdown");
@@ -99,10 +107,25 @@ function reset() {
     //! resets values
     countdownTitle = "";
     countdownDate = "";
-
+    // resets local storage
+    localStorage.removeItem("countdown");
+}
+// restores countdown from cache
+function restorePreviousCountdown() {
+    if (localStorage.getItem('countdown')){
+        inputContainer.hidden = true;
+        savedCountdown = JSON.parse(localStorage.getItem('countdown'));
+        countdownTitle = savedCountdown.title;
+        countdownDate = savedCountdown.date;
+        countdownValue = new Date(countdownDate).getTime();
+        updateDOM();
+    }
 }
 
 //! Event Listeners
 countdownForm.addEventListener("submit", updateCountdown);
 countdownBtn.addEventListener("click", reset);
 completeBtn.addEventListener("click", reset);
+
+// on Load check storage
+restorePreviousCountdown();
